@@ -35,7 +35,7 @@ from collections import Counter
 x = datetime.datetime.today()
 nowTimeDate = x.strftime("%b_%d_%Y_%H_%M")
 
-ImagetoTest = 6
+ImagetoTest = 1
 epoch  = 10
 batch_size = 80
 verbose=1 #verbose=1 will show you an animated progress bar
@@ -43,7 +43,7 @@ doSMOTE = False #do replicate data using SMOTE method
 
 # PltNAme = 'ForIM'+str(ImagetoTest)+'_combined'+str(epoch)+'_batch_size='+str(batch_size)+'_SMOTE='+str(doSMOTE)+'_'+nowTimeDate
 
-PltNAme = 'AT_Image_Shuffled_Ext_'+str(ImagetoTest)
+PltNAme = 'AT_Image_Shuffled_Ext_'+str(ImagetoTest)+'n'
 
 #### Read Data
 # ScenariosData = sio.loadmat('E:\AutomatedTraceResults\DataForConnectingTraining\Data_For_AE_BranchScenarios\All_scenarios_label_14Features_Image_Trace_new.mat')
@@ -240,6 +240,8 @@ model.compile(loss='binary_crossentropy',
               )
 
 tensorboard = TensorBoard(log_dir="E:/AutomatedTracing/AutomatedTracing/Python/logs/"+PltNAme)
+# tensorboard --logdir=E:\AutomatedTracing\AutomatedTracing\Python\logs
+
 
 # fit(x=None, y=None, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None, initial_epoch=0, steps_per_epoch=None, validation_steps=None, validation_freq=1, max_queue_size=10, workers=1, use_multiprocessing=False)
 history = model.fit([XIMs_train,XFeature_train,XScenarios_train],
@@ -249,6 +251,10 @@ history = model.fit([XIMs_train,XFeature_train,XScenarios_train],
                     validation_split=0.2,
                     verbose=True,
                     callbacks=[tensorboard])
+
+
+
+
 
 #######                Save Model
 # model.save('E:/AutomatedTracing/Data/Models/ScenarioConnectome/Shuffled_IM_'+str(ImagetoTest)+'_out.h5')
@@ -306,75 +312,75 @@ TP = corrctnum
 FN = incorrectnum
 
 
-################################## Plot Confusion Matrix - ROC ###############################################################
-
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score,balanced_accuracy_score, accuracy_score,roc_curve,auc
-import itertools
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=0)
-    plt.yticks(tick_marks, classes)
-
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        #print("Normalized confusion matrix")
-    else:
-        1#print('Confusion matrix, without normalization')
-
-    #print(cm)
-
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, cm[i, j],
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-class_names = [0,1]
-# TO DO: fix the rounding, got different result with the actual test
-cnf_matrix_tra = confusion_matrix(LabelsTest.round(), y_pred.round())
-plt.figure()
-plot_confusion_matrix(cnf_matrix_tra , classes=class_names, title='Test Confusion matrix')
-plt.show()
-
-x_pred = model.predict([XIMs_train,XFeature_train,XScenarios_train])
-x_pred = x_pred[:,0]
-cnf_matrix_tra = confusion_matrix(LabelsTrain.round(), x_pred.round())
-plt.figure()
-plot_confusion_matrix(cnf_matrix_tra , classes=class_names, title='Train Confusion matrix')
-plt.show()
-
-
-
-fpr, tpr, thresholds = roc_curve(LabelsTest.round(), y_pred.round())
-
-roc_auc = auc(fpr,tpr)
-
-# Plot ROC
-plt.title('Receiver Operating Characteristic')
-plt.plot(fpr, tpr, 'b',label='AUC = %0.3f'% roc_auc)
-plt.legend(loc='lower right')
-plt.plot([0,1],[0,1],'r--')
-plt.xlim([-0.1,1.0])
-plt.ylim([-0.1,1.01])
-plt.ylabel('True Positive Rate')
-plt.xlabel('False Positive Rate')
-plt.show()
-
-
-########################################################################################################################
+# ################################## Plot Confusion Matrix - ROC ###############################################################
+#
+# from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score,balanced_accuracy_score, accuracy_score,roc_curve,auc
+# import itertools
+# def plot_confusion_matrix(cm, classes,
+#                           normalize=False,
+#                           title='Confusion matrix',
+#                           cmap=plt.cm.Blues):
+#     """
+#     This function prints and plots the confusion matrix.
+#     Normalization can be applied by setting `normalize=True`.
+#     """
+#     plt.imshow(cm, interpolation='nearest', cmap=cmap)
+#     plt.title(title)
+#     plt.colorbar()
+#     tick_marks = np.arange(len(classes))
+#     plt.xticks(tick_marks, classes, rotation=0)
+#     plt.yticks(tick_marks, classes)
+#
+#     if normalize:
+#         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+#         #print("Normalized confusion matrix")
+#     else:
+#         1#print('Confusion matrix, without normalization')
+#
+#     #print(cm)
+#
+#     thresh = cm.max() / 2.
+#     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#         plt.text(j, i, cm[i, j],
+#                  horizontalalignment="center",
+#                  color="white" if cm[i, j] > thresh else "black")
+#
+#     plt.tight_layout()
+#     plt.ylabel('True label')
+#     plt.xlabel('Predicted label')
+# class_names = [0,1]
+# # TO DO: fix the rounding, got different result with the actual test
+# cnf_matrix_tra = confusion_matrix(LabelsTest.round(), y_pred.round())
+# plt.figure()
+# plot_confusion_matrix(cnf_matrix_tra , classes=class_names, title='Test Confusion matrix')
+# plt.show()
+#
+# x_pred = model.predict([XIMs_train,XFeature_train,XScenarios_train])
+# x_pred = x_pred[:,0]
+# cnf_matrix_tra = confusion_matrix(yIMs_train.round(), x_pred.round())
+# plt.figure()
+# plot_confusion_matrix(cnf_matrix_tra , classes=class_names, title='Train Confusion matrix')
+# plt.show()
+#
+#
+#
+# fpr, tpr, thresholds = roc_curve(LabelsTest.round(), y_pred.round())
+#
+# roc_auc = auc(fpr,tpr)
+#
+# # Plot ROC
+# plt.title('Receiver Operating Characteristic')
+# plt.plot(fpr, tpr, 'b',label='AUC = %0.3f'% roc_auc)
+# plt.legend(loc='lower right')
+# plt.plot([0,1],[0,1],'r--')
+# plt.xlim([-0.1,1.0])
+# plt.ylim([-0.1,1.01])
+# plt.ylabel('True Positive Rate')
+# plt.xlabel('False Positive Rate')
+# plt.show()
+#
+#
+# ########################################################################################################################
 
 
 
